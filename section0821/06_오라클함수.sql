@@ -21,9 +21,7 @@
  select rpad('SKY',5,'*') from dual;          --5칸내에서 출력하고 오른쪽 빈칸은 *로 채움
  select replace('happy','p','k') from dual;   --특정문자 변환
  
- 
- 2. 숫자 관련 함수
- select concat('로미오','줄리엣') from dual;    --로미오줄리엣
+  select concat('로미오','줄리엣') from dual;    --로미오줄리엣
  
  select concat(uname,'의 평균은'), concat(aver,'입니다')
  from sungjuk;
@@ -34,6 +32,9 @@
  -- 결합연산자 ||
  select uname || '의 평균은' || aver || ' 입니다' from sungjuk;
  select uname || '의 평균은' || aver || ' 입니다' as str from sungjuk;
+ 
+ 2. 숫자 관련 함수
+
  
  3. 날짜 관련 함수
  

@@ -39,7 +39,7 @@ select * from sungjuk order by sno desc;
 문제) sungjuk테이블에 아래 데이터를 행추가 하시오.
 
 sno : max(sno) + 1;
-     단 max()애 null 이면 0ㅇ로 바꾼후 계산한다.
+     단 max()애 null 이면 0으로 바꾼후 계산한다.
      
 --insert into sungjuk(sno,uname,kor,eng,mat,addr,wdate)
 --values (nvl(max(sno)+1,0),'손흥민',100,100,100,'Seoul',sysdate);

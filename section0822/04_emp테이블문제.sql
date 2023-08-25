@@ -10,7 +10,7 @@ create table emp(
   ,ename      varchar2(50)              --이름
   ,job        varchar2(10)              --직급
   ,mgr        number(4)                 --매니저정보
-  ,hiredate   date                      --입사일
+  ,hiredate   date--입사일
   ,sal        number(7,2)               --급여(소수점 2자리)
   ,comm       number(7,2)               --커미션(보너스)
   ,deptno     number(2)                 --부서코드(-99~99)
@@ -288,27 +288,136 @@ from emp
 group by deptno;
 
 문36) hiredate칼럼을 사용하여 월별로 입사한 인원수를 구하시오
+select ename, hiredate from emp order by hiredate;
 
+-- 일사일에서 월 가져오기
+select hiredate, to_char(hiredate, 'mm') as 입사월 from emp;
+select hiredate, to_char(hiredate, 'dd') as 입사일 from emp;
+select hiredate, to_char(hiredate, 'yy') as 입사년도 from emp;
 
-문37) 매니저별 담당인원수를 조회하시오
+-- 입사월을 정렬해서 조회하기
+select hiredate, to_char(hiredate,'mm')
+from emp
+order by to_char(hiredate,'mm');
 
+--입사월별로 그룹화 하기
+select to_char(hiredate,'mm')
+from emp
+group by to_char(hiredate,'mm');
 
-문38) 사원번호 7654와 급여보다 적은 행을 조회하시오
+--입사월별로 그룹화 하고 행 갯수 구하기.
+select to_char(hiredate,'mm'), count(*)
+from emp
+group by to_char(hiredate,'mm');
 
+select to_char(hiredate,'mm') as 입사월, count(*) as 인원수
+from emp
+group by to_char(hiredate,'mm')
+order by to_char(hiredate,'mm');
+
+문37) 매니저별 담당인원수를 조회하시오 (mgr: 부서 상관의 사원번호)
+select mgr from emp order by mgr;
+
+select mgr, count(*)
+from emp
+group by mgr
+order by mgr;
+
+문38) 사원번호 7654와 급여보다 적은 행을 조회하시오 (서브쿼리)
+select ename, sal
+from emp
+where empno=7654;
+
+select ename, sal
+from emp
+where sal<400;
+
+select ename, sal
+from emp
+where sal<(select sal from emp where empno=7654);
 
 문39) 부서별로 급여+커미션를 구했을때  최대값, 최소값, 평균값(반올림 해서)을 부서순으로 조회하시오
+select deptno, sal, comm from emp order by deptno;
+select deptno, sal, comm, sal+comm from emp order by deptno;
+select deptno, sal, comm, sal+nvl(comm,0) from emp order by deptno;
+
+select deptno, max(sal+nvl(comm,0)), min(sal+nvl(comm,0)), avg(sal+nvl(comm,0)) 
+from emp group by deptno order by deptno;
+
+select deptno
+      , max(sal+nvl(comm,0))
+      , min(sal+nvl(comm,0))
+      , round(avg(sal+nvl(comm,0)),0)
+from emp group by deptno order by deptno;
+
+
+select * from emp;
 
 문40) 각 직원들에 대해서 직원의 이름과 근속년수를 구하시오
       단, 근속년수는 연단위를 버림하여 나타내시오
+      
+      --이름 입사일을 입사일 순으로 조회하시오.
+select ename, hiredate from emp order by hiredate;
+
+-- 근속일 : 현재날짜 - 입사일
+select ename, hiredate, trunc((sysdate-hiredate)/365,0) from emp;
+
+select ename, hiredate, trunc((sysdate-hiredate)/365,0) as 근속년수 from emp;
+
+select ename, hiredate, trunc((sysdate-hiredate)/365,0) as 근속년수 from emp order by trunc((sysdate-hiredate)/365,0) desc;
 
 문41) 아래와 같이 출력 하시오
       예) 박지성의 근속년수 : 20년
 
+select ename || '의 근속년수 : ' || trunc((sysdate-hiredate)/365,0) || '년' as 근속년수
+from emp
+order by hiredate;
+
 문42) 손흥민의 근속년수와 동일한 행을 조회(이름, 근속년수)하시오
+select ename, trunc((sysdate-hiredate)/365,0)
+from emp
+where trunc((sysdate-hiredate)/365,0)=(Select trunc((sysdate-hiredate)/365,0) from emp where ename='손흥민');
+
+-- 손흥민 조회하기
+select * from emp where ename='손흥민';
+-- 손흥민의 근속년수 구하기.
+Select trunc((sysdate-hiredate)/365,0) from emp where ename='손흥민';
+
+-- 근속년수 구하기.
+select ename, trunc((sysdate-hiredate)/365,0) 
+from emp
+where trunc((sysdate-hiredate)/365,0) = (Select trunc((sysdate-hiredate)/365,0) from emp where ename='손흥민');
+
+
+
 
 문43) 입사한지 만20년 이상된 사람에 한해 현재연봉에서 10% 인상시켰을 때 
       사번, 이름, 입사일, 현재연봉, 인상후연봉, 인상된금액으로 고액연봉순으로 조회하시오
       연봉구하는 식 : 급여(sal)*12개월+보너스(comm)
+      
+      select ename, trunc((sysdate-hiredate)/365,0)
+      from emp
+      where trunc((sysdate-hiredate)/365,0)>=20;
+      
+      select ename, hiredate, sal, comm, sal*12+comm as 연봉
+      from emp
+      where trunc((sysdate-hiredate)/365,0)>=20;
+      
+      select ename, hiredate, sal, nvl(comm,0), sal*12+nvl(comm,0) as 현재연봉
+      from emp
+      where trunc((sysdate-hiredate)/365,0)>=20;
+      
+      select ename, hiredate, sal, nvl(comm,0)
+            , sal*12+nvl(comm,0) as 현재연봉
+            , (sal*12+nvl(comm,0))*(0.1) as 인상된금액
+            , (1.1)*sal*12+nvl(comm,0) as 최종연봉
+      from emp
+      where trunc((sysdate-hiredate)/365,0)>=20
+      order by 최종연봉 desc;
 
 문44) 입사년도가 짝수인 직원들의 급여의 평균을 job별로 출력하시오
+    select job, avg(sal)
+    from emp
+    where mod(extract(year from hiredate),2)=0
+    group by job;
 
